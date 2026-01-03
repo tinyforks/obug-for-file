@@ -11,7 +11,7 @@ jobs:
           ref: main
       - uses: ./.github/actions/prepare
       - run: pnpm build
-      - uses: JoshuaKGoldberg/release-it-action@v0.4.0
+      - uses: JoshuaKGoldberg/release-it-action@8ee87d0d30f97b452ef5d8aa9f4d0490eed439aa # v0.4.0
         with:
           github-token: ${{ github.token }}
 

@@ -19,19 +19,12 @@
       ]
     },
     {
-      "login": "tinyforks",
-      "name": "Tinyforks",
-      "avatar_url": "https://avatars.githubusercontent.com/u/195489710?v=4",
-      "profile": "https://github.com/tinyforks",
+      "login": "lishaduck",
+      "name": "Eli",
+      "avatar_url": "https://avatars.githubusercontent.com/u/88557639?v=4",
+      "profile": "http://lishaduck.github.io",
       "contributions": [
-        "code",
-        "content",
-        "doc",
-        "ideas",
-        "infra",
-        "maintenance",
-        "projectManagement",
-        "tool"
+        "bug"
       ]
     }
   ],

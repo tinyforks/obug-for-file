@@ -1,7 +1,7 @@
-import debug from "debug";
+import { createDebug } from "obug";
 
 import { filePathToNamespace } from "./filePathToNamespace.js";
 
 export function debugForFile(filePath: string) {
-	return debug(filePathToNamespace(filePath));
+	return createDebug(filePathToNamespace(filePath));
 }

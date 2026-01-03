@@ -1,6 +1,6 @@
 {
 	"name": "obug-for-file",
-	"version": "1.0.0+1",
+	"version": "2.0.0",
 	"description": "debug() wrapper that creates a string based on your file's path within the package. 🧶",
 	"repository": {
 		"type": "git",

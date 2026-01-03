@@ -17,6 +17,22 @@
         "tool",
         "doc"
       ]
+    },
+    {
+      "login": "tinyforks",
+      "name": "Tinyforks",
+      "avatar_url": "https://avatars.githubusercontent.com/u/195489710?v=4",
+      "profile": "https://github.com/tinyforks",
+      "contributions": [
+        "code",
+        "content",
+        "doc",
+        "ideas",
+        "infra",
+        "maintenance",
+        "projectManagement",
+        "tool"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -24,8 +40,8 @@
   "files": [
     "README.md"
   ],
-  "projectName": "debug-for-file",
-  "projectOwner": "JoshuaKGoldberg",
+  "projectName": "obug-for-file",
+  "projectOwner": "tinyforks",
   "repoType": "github",
   "commitConvention": "angular"
 }

@@ -14,8 +14,8 @@ jobs:
 
             The release is available on:
 
-            * [GitHub releases](https://github.com/JoshuaKGoldberg/debug-for-file/releases/tag/{release_tag})
-            * [npm package (@latest dist-tag)](https://www.npmjs.com/package/debug-for-file/v/${{ env.npm_version }})
+            * [GitHub releases](https://github.com/tinyforks/obug-for-file/releases/tag/{release_tag})
+            * [npm package (@latest dist-tag)](https://www.npmjs.com/package/obug-for-file/v/${{ env.npm_version }})
 
             Cheers! 📦🚀
 

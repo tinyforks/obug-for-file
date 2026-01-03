@@ -44,7 +44,7 @@ describe("filePathToNamespace", () => {
 		expect(actual).toBe("def");
 	});
 
-	it("handles invalid package manfiest format", () => {
+	it("handles invalid package manifest format", () => {
 		mockUp.mockReturnValueOnce("abc/package.json");
 		mockReadFileSync.mockReturnValue(`{}`);
 

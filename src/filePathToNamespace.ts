@@ -1,6 +1,6 @@
-import * as path from "node:path";
-import * as fs from "node:fs";
 import * as pkg from "empathic/package";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 import { generateNamespace } from "./generateNamespace.js";
 
@@ -17,12 +17,15 @@ export function filePathToNamespace(filePath: string): string {
 
 	const packageContent = fs.readFileSync(packageUp, "utf-8");
 
+	/* eslint-disable no-var */
 	try {
-		var packageJson: { name?: unknown } | undefined =
-			JSON.parse(packageContent);
+		var packageJson: undefined | { name?: unknown } = JSON.parse(
+			packageContent,
+		) as unknown as undefined | { name?: unknown };
 	} catch {
-		var packageJson: { name?: unknown } | undefined = undefined;
+		var packageJson: undefined | { name?: unknown } = undefined;
 	}
+	/* eslint-enable no-var */
 	if (
 		packageJson !== undefined &&
 		"name" in packageJson &&

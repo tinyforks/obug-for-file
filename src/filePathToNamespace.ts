@@ -1,43 +1,49 @@
-import * as pkg from "empathic/package";
 import * as fs from "node:fs";
+import { findPackageJSON } from "node:module";
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { generateNamespace } from "./generateNamespace.js";
 
 export function filePathToNamespace(filePath: string): string {
-	const resolved = filePath.startsWith("file:")
+	const resolved = filePath.startsWith("file://")
 		? fileURLToPath(filePath)
 		: filePath;
 
-	const packageUp = pkg.up({
-		cwd: path.dirname(resolved),
-	});
+	const packageJsonPath = findPackageJSON(".", pathToFileURL(resolved));
 
-	if (!packageUp) {
+	if (
+		packageJsonPath === undefined ||
+		path.basename(packageJsonPath) !== "package.json"
+	) {
 		return generateNamespace(resolved);
 	}
 
-	const filePathRelative = path.relative(path.dirname(packageUp), resolved);
+	const filePathRelative = path.relative(
+		path.dirname(packageJsonPath),
+		resolved,
+	);
 
-	const packageContent = fs.readFileSync(packageUp, "utf-8");
+	const packageName = readPackageName(packageJsonPath);
 
-	/* eslint-disable no-var */
+	return packageName === undefined
+		? generateNamespace(filePathRelative)
+		: generateNamespace(filePathRelative, packageName);
+}
+
+function readPackageName(packageJsonPath: string) {
+	let contents: unknown;
+
 	try {
-		var packageJson: undefined | { name?: unknown } = JSON.parse(
-			packageContent,
-		) as unknown as undefined | { name?: unknown };
+		contents = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
 	} catch {
-		var packageJson: undefined | { name?: unknown } = undefined;
+		return undefined;
 	}
-	/* eslint-enable no-var */
-	if (
-		packageJson !== undefined &&
-		"name" in packageJson &&
-		typeof packageJson.name == "string"
-	) {
-		return generateNamespace(filePathRelative, packageJson.name);
-	} else {
-		return generateNamespace(filePathRelative);
-	}
+
+	return typeof contents === "object" &&
+		contents !== null &&
+		"name" in contents &&
+		typeof contents.name === "string"
+		? contents.name
+		: undefined;
 }

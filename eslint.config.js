@@ -50,6 +50,12 @@ export default defineConfig(
 
 			// https://github.com/eslint-community/eslint-plugin-n/issues/472
 			"n/no-unpublished-bin": "off",
+
+			// Deliberately adopted while still experimental: https://github.com/tinyforks/obug-for-file/issues/2
+			"n/no-unsupported-features/node-builtins": [
+				"error",
+				{ ignores: ["module.findPackageJSON"] },
+			],
 		},
 		settings: { perfectionist: { partitionByComment: true, type: "natural" } },
 	},

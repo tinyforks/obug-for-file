@@ -1,19 +1,24 @@
 import * as pkg from "empathic/package";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { generateNamespace } from "./generateNamespace.js";
 
 export function filePathToNamespace(filePath: string): string {
+	const resolved = filePath.startsWith("file:")
+		? fileURLToPath(filePath)
+		: filePath;
+
 	const packageUp = pkg.up({
-		cwd: path.dirname(filePath),
+		cwd: path.dirname(resolved),
 	});
 
 	if (!packageUp) {
-		return generateNamespace(filePath);
+		return generateNamespace(resolved);
 	}
 
-	const filePathRelative = path.relative(path.dirname(packageUp), filePath);
+	const filePathRelative = path.relative(path.dirname(packageUp), resolved);
 
 	const packageContent = fs.readFileSync(packageUp, "utf-8");
 

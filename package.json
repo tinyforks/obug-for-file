@@ -38,7 +38,6 @@
 		"*": "prettier --ignore-unknown --write"
 	},
 	"dependencies": {
-		"empathic": "^2.0.0",
 		"obug": "^2.1.1"
 	},
 	"devDependencies": {
@@ -76,7 +75,7 @@
 	},
 	"packageManager": "pnpm@10.27.0",
 	"engines": {
-		"node": ">=18.3.0"
+		"node": ">=22.14.0"
 	},
 	"publishConfig": {
 		"provenance": true

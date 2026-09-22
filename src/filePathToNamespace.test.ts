@@ -1,70 +1,100 @@
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { pathToFileURL } from "node:url";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { filePathToNamespace } from "./filePathToNamespace.js";
 
-const mockUp = vi.fn();
-const mockReadFileSync = vi.fn();
+const mockFindPackageJSON = vi.fn();
 
-vi.mock("empathic/package", () => ({
-	get up() {
-		return mockUp;
+vi.mock("node:module", () => ({
+	get findPackageJSON() {
+		return mockFindPackageJSON;
 	},
 }));
 
-vi.mock("node:fs", () => ({
-	get readFileSync() {
-		return mockReadFileSync;
-	},
-}));
+let fixtures: string;
+
+function writeFixture(name: string, contents: string) {
+	const directory = path.join(fixtures, name);
+
+	fs.mkdirSync(directory, { recursive: true });
+
+	const packageJsonPath = path.join(directory, "package.json");
+
+	fs.writeFileSync(packageJsonPath, contents);
+
+	return packageJsonPath;
+}
+
+beforeAll(() => {
+	fixtures = fs.mkdtempSync(path.join(os.tmpdir(), "obug-for-file-"));
+});
+
+afterAll(() => {
+	fs.rmSync(fixtures, { force: true, recursive: true });
+});
 
 describe("filePathToNamespace", () => {
-	it("generates a namespace with just the filePath when readPackageUpSync doesn't resolve a package.json", () => {
-		mockUp.mockReturnValueOnce(undefined);
+	it("generates a namespace with just the filePath when findPackageJSON doesn't resolve a package.json", () => {
+		mockFindPackageJSON.mockReturnValueOnce(undefined);
 
 		const actual = filePathToNamespace("abc/def");
 
 		expect(actual).toBe("abc:def");
 	});
 
-	it("generates a namespace including the package name when readPackageUpSync resolves a package.json", () => {
-		mockUp.mockReturnValueOnce("abc/package.json");
-		mockReadFileSync.mockReturnValue(`{"name": "xyz"}`);
+	it("generates a namespace with just the filePath when findPackageJSON resolves a directory", () => {
+		mockFindPackageJSON.mockReturnValueOnce("/repo/pkg/lib/sub/");
 
 		const actual = filePathToNamespace("abc/def");
+
+		expect(actual).toBe("abc:def");
+	});
+
+	it("generates a namespace including the package name when findPackageJSON resolves a package.json", () => {
+		const packageJsonPath = writeFixture("named", `{"name": "xyz"}`);
+		mockFindPackageJSON.mockReturnValueOnce(packageJsonPath);
+
+		const actual = filePathToNamespace(path.join(fixtures, "named", "def.js"));
 
 		expect(actual).toBe("xyz:def");
 	});
 
 	it("handles invalid JSON", () => {
-		mockUp.mockReturnValueOnce("abc/package.json");
-		mockReadFileSync.mockReturnValue(`{"name}`);
+		const packageJsonPath = writeFixture("invalid", `{"name}`);
+		mockFindPackageJSON.mockReturnValueOnce(packageJsonPath);
 
-		const actual = filePathToNamespace("abc/def");
+		const actual = filePathToNamespace(
+			path.join(fixtures, "invalid", "def.js"),
+		);
 
 		expect(actual).toBe("def");
 	});
 
 	it("handles invalid package manifest format", () => {
-		mockUp.mockReturnValueOnce("abc/package.json");
-		mockReadFileSync.mockReturnValue(`{}`);
+		const packageJsonPath = writeFixture("unnamed", `{"private": true}`);
+		mockFindPackageJSON.mockReturnValueOnce(packageJsonPath);
 
-		const actual = filePathToNamespace("abc/def");
+		const actual = filePathToNamespace(
+			path.join(fixtures, "unnamed", "def.js"),
+		);
 
 		expect(actual).toBe("def");
 	});
 
 	it("resolves a file:// URL to its package path when given import.meta.url", () => {
-		mockUp.mockReturnValueOnce("/repo/pkg/package.json");
-		mockReadFileSync.mockReturnValue(`{"name": "xyz"}`);
+		const packageJsonPath = writeFixture("url", `{"name": "xyz"}`);
+		mockFindPackageJSON.mockReturnValueOnce(packageJsonPath);
+		const filePath = path.join(fixtures, "url", "lib", "sub", "file.js");
 
-		const actual = filePathToNamespace(
-			pathToFileURL("/repo/pkg/lib/sub/file.js").href,
+		const actual = filePathToNamespace(pathToFileURL(filePath).href);
+
+		expect(mockFindPackageJSON).toHaveBeenCalledWith(
+			".",
+			pathToFileURL(filePath),
 		);
-
-		expect(mockUp).toHaveBeenCalledWith({
-			cwd: "/repo/pkg/lib/sub",
-		});
 		expect(actual).toBe("xyz:sub:file");
 	});
 });
